@@ -1,4 +1,4 @@
-var app = angular.module('spa', ['ngRoute', 'angular-joystick']);
+var app = angular.module('spa', ['ngRoute', 'joystick']);
 app.config(function($routeProvider){
     $routeProvider
         .when('/control', {

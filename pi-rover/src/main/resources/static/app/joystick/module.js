@@ -14,6 +14,8 @@ var joystickController = function($scope, $attrs) {
 	var outerRadius = 2 * bounds.radius / 3;
 	var innerRadius = outerRadius / 2; 
 	
+	var started = false;
+	
 	var draw = function(vector /* angle and normalized magnitude between 0.0 and 1.0 */) {
 		var ctx = canvas.getContext('2d');						
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -85,20 +87,33 @@ var joystickController = function($scope, $attrs) {
 		return canvasCoordinates;
 	};
 	
-	$scope.onMouseMove = function(canvasCoordinates) {
-		//console.log('x: ' + x + ' y: ' + y);
-		// Convert relative to center
-		var relativeCoordinates = canvasCoordinatesToRelativeCoordinates(canvasCoordinates);
-		var vector = relativeCoordinatesToVector(relativeCoordinates);
-		
+	$scope.onTouchStart = function() {
+		started = true;
+	};
+	
+	$scope.onTouchEnd = function() {
+		started = false;
+		vector.angle = 0.0;
+		vector.magnitude = 0.0;
 		draw(vector);
-		
-		//$scope.onMove();
+	};
+	
+	$scope.onTouchMove = function(canvasCoordinates) {
+		if(started){
+			//console.log('x: ' + x + ' y: ' + y);
+			// Convert relative to center
+			var relativeCoordinates = canvasCoordinatesToRelativeCoordinates(canvasCoordinates);
+			var vector = relativeCoordinatesToVector(relativeCoordinates);
+			
+			draw(vector);
+			
+			//$scope.onMove();
+		}
 	};
 	
 	var vector = {
-		angle: 45.0,
-		magnitude: 0.5
+		angle: 0.0,
+		magnitude: 0.0
 	};
 	
 	draw(vector);
@@ -113,10 +128,32 @@ var joystickDirective = function () {
             onMove: '&'
     	},
         controller: joystickController,
-        link: function ($scope, element, attrs) { //DOM manipulation 
-        	element.on('mousemove', function(e) {
-        		var canvasCoordinates = {x: e.offsetX, y:e.offsetY};
-        		$scope.onMouseMove(canvasCoordinates);
+        link: function ($scope, element, attrs) { //DOM manipulation
+        	element.on('touchstart', function(e) {
+        		e.preventDefault();
+        		$scope.onTouchStart();
+        	});
+        	
+        	element.on('touchend', function(e) {
+        		e.preventDefault();
+        		$scope.onTouchEnd();
+        	});
+        	
+        	element.on('touchmove', function(e) {
+        		e.preventDefault();
+        		var event = window.event; // for some reason, 'e' is useless so we get all data from event
+        		//var statusElement = $('#' + attrs.id + '-status');
+        		//statusElement.html('event.targetTouches: ' + event.targetTouches);
+        		if(event.targetTouches.length > 0){        			        		
+	        		var touch = event.targetTouches[0];
+	        		var offset = element.offset();
+	        		var x = touch.pageX - offset.left;
+	        		var y = touch.pageY - offset.top;
+	        		//statusElement.html('x='+x + '  y= ' + y);
+	        		//var canvasCoordinates = {x: e.offsetX, y:e.offsetY}; // for using mousemove instead of touchmove
+	        		var canvasCoordinates = {x: x, y: y};
+	        		$scope.onTouchMove(canvasCoordinates);
+        		}
         	});
         } 
     };

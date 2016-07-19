@@ -16,7 +16,7 @@ var joystickController = function($scope, $attrs) {
 	
 	var started = false;
 	
-	var draw = function(vector /* angle and normalized magnitude between 0.0 and 1.0 */) {
+	var draw = function(vector) {
 		var ctx = canvas.getContext('2d');						
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		
@@ -38,7 +38,6 @@ var joystickController = function($scope, $attrs) {
 		// Little circle
 		var relativeCoordinates = vectorToRelativeCoordinates(vector);
 		var canvasCoordinates = relativeCoordinatesToCanvasCoordinates(relativeCoordinates);
-		console.log("Drawing at " + canvasCoordinates.x + ", " + canvasCoordinates.y);
 		ctx.fillStyle = 'green';
 		ctx.beginPath();
 		ctx.arc(canvasCoordinates.x, canvasCoordinates.y, innerRadius, 0, 2 * Math.PI);
@@ -87,36 +86,36 @@ var joystickController = function($scope, $attrs) {
 		return canvasCoordinates;
 	};
 	
+	var onVectorChange = function(vector) {
+		draw(vector);
+		$scope.onMove({vector: vector});		
+	};
+	
 	$scope.onTouchStart = function() {
 		started = true;
 	};
 	
 	$scope.onTouchEnd = function() {
 		started = false;
-		vector.angle = 0.0;
-		vector.magnitude = 0.0;
-		draw(vector);
+		resetVector();
 	};
 	
 	$scope.onTouchMove = function(canvasCoordinates) {
 		if(started){
-			//console.log('x: ' + x + ' y: ' + y);
-			// Convert relative to center
 			var relativeCoordinates = canvasCoordinatesToRelativeCoordinates(canvasCoordinates);
 			var vector = relativeCoordinatesToVector(relativeCoordinates);
-			
-			draw(vector);
-			
-			//$scope.onMove();
+			onVectorChange(vector);
 		}
 	};
 	
-	var vector = {
-		angle: 0.0,
-		magnitude: 0.0
+	var resetVector = function() {
+		onVectorChange({
+			angle: 0.0,
+			magnitude: 0.0
+		});		
 	};
-	
-	draw(vector);
+		
+	resetVector();
 };
 
 var joystickDirective = function () {
@@ -131,16 +130,22 @@ var joystickDirective = function () {
         link: function ($scope, element, attrs) { //DOM manipulation
         	element.on('touchstart', function(e) {
         		e.preventDefault();
+        		//var statusElement = $('#' + attrs.id + '-status');
+        		//statusElement.html('start');
         		$scope.onTouchStart();
         	});
         	
         	element.on('touchend', function(e) {
         		e.preventDefault();
+        		//var statusElement = $('#' + attrs.id + '-status');
+        		//statusElement.html('end');
         		$scope.onTouchEnd();
         	});
         	
         	element.on('touchmove', function(e) {
         		e.preventDefault();
+        		//var statusElement = $('#' + attrs.id + '-status');
+        		//statusElement.html('move');
         		var event = window.event; // for some reason, 'e' is useless so we get all data from event
         		//var statusElement = $('#' + attrs.id + '-status');
         		//statusElement.html('event.targetTouches: ' + event.targetTouches);

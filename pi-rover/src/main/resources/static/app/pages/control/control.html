@@ -1,5 +1,24 @@
-<canvas joystick id="left-joystick" on-move="onLeftJoystickMove()"/>
-<canvas joystick id="right-joystick" on-move="onRightJoystickMove()"/>
-<br />
-<div id="left-joystick-status"></div>
-<div id="right-joystick-status"></div>
+<div class="row">
+	<h2>Connection: connected</h2>
+</div>
+
+<div class="row">
+	<div class="col-xs-6">
+		<canvas joystick id="left-joystick" on-move="onLeftJoystickMove(vector)"/>
+	</div>
+	<div class="col-xs-6">
+		<canvas joystick id="right-joystick" on-move="onRightJoystickMove(vector)"/>
+	</div>
+</div>
+
+<div class="row">
+	<div class="col-xs-6">
+		<div id="left-joystick-status"></div>		
+	</div>
+	<div class="col-xs-6">
+		<div id="right-joystick-status"></div>
+	</div>
+</div>
+
+
+

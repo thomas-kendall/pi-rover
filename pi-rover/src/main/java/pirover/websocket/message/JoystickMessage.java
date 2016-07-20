@@ -1,5 +1,7 @@
 package pirover.websocket.message;
 
+import pirover.model.Vector;
+
 public class JoystickMessage {
 	private String joystick;
 	private double angle;
@@ -40,5 +42,9 @@ public class JoystickMessage {
 	@Override
 	public String toString() {
 		return JoystickMessageMarshaller.toJSON(this);
+	}
+
+	public Vector toVector() {
+		return new Vector(getAngle(), getMagnitude());
 	}
 }

@@ -25,7 +25,8 @@ public class Rover implements Runnable {
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
-				e.printStackTrace();
+				// On application close, Thread.sleep() throws this exception
+				looping = false;
 			}
 		}
 	}
